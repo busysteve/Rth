@@ -12,9 +12,9 @@
 
 #include "Rth.h"
 
-extern "C" {
+//extern "C" {
 #include "hash.h"
-}
+//}
 
 #ifdef GPU
 #define flouble float
@@ -32,7 +32,9 @@ struct parallel_random_normal : public thrust::unary_function<thrust::tuple<cons
   __host__ __device__
   flouble operator()(unsigned int threadIdx)
   {
-    unsigned int seed = thrust_hash(threadIdx) * thrust::get<0>(t);
+	thrust_hash th;
+
+    unsigned int seed = th(threadIdx) * thrust::get<0>(t);
     
     thrust::minstd_rand rng(seed);
     thrust::random::normal_distribution<flouble> nrm(thrust::get<1>(t), thrust::get<2>(t));

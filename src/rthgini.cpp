@@ -3,8 +3,18 @@
 #include <thrust/reduce.h>
 #include <thrust/transform_reduce.h>
 #include <thrust/functional.h>
+#include <thrust/execution_policy.h>
 
 #include "Rth.h"
+
+
+
+#ifdef GPU
+#define flouble float
+#else
+#define flouble double
+#endif
+
 
 
 typedef thrust::device_vector<flouble>::iterator floubleveciter;
@@ -41,7 +51,7 @@ extern "C" SEXP rthgini(SEXP x, SEXP mu, SEXP unbiased_, SEXP nthreads)
   
   RTH_GEN_NTHREADS(nthreads);
   
-  thrust::device_vector<double> dx(REAL(x), REAL(x)+n);
+  thrust::device_vector<flouble> dx(REAL(x), REAL(x)+n);
   
   thrust::sort(dx.begin(), dx.end());
   
@@ -49,7 +59,7 @@ extern "C" SEXP rthgini(SEXP x, SEXP mu, SEXP unbiased_, SEXP nthreads)
   thrust::counting_iterator<int> end = begin + n;
   
   thrust::plus<flouble> binop;
-  DBL(gini) = (double) thrust::transform_reduce(begin, end, compute_gini(n, dx.begin()), (flouble) 0., binop);
+  DBL(gini) = (double) thrust::transform_reduce( thrust::device, begin, end, compute_gini(n, dx.begin()), (flouble) 0.0, binop);
   
   if (unbiased)
     DBL(gini) = DBL(gini) / (n*(n-1)*DBL(mu));

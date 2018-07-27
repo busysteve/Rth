@@ -58,7 +58,7 @@ void transpose(size_t nr, size_t nc, thrust::device_vector<T>& src, thrust::devi
      dst.begin());
 }
 
-RcppExport SEXP rthxposnv(SEXP m) 
+extern "C" SEXP rthxposnv(SEXP m) 
 {
   SEXP routmat;
   int nr = nrows(m);

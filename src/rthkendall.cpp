@@ -24,6 +24,7 @@ struct calcgti {
   int n;
   flouble *wdx;
   flouble *wdy;
+
   calcgti(floublevec _dx,floublevec _dy,int _n) :
     dx(_dx),
     dy(_dy),

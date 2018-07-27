@@ -3,6 +3,7 @@
 // break data in to chunks, computing a histogram on each, then
 // combining
 #include <thrust/device_vector.h>
+#include <thrust/extrema.h>
 
 #include "Rth.h"
 

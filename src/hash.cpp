@@ -1,7 +1,13 @@
 #include <R.h>
 #include <Rdefines.h>
+#include <hash.h>
+
 
 #define INT(x) INTEGER(x)[0]
+
+
+
+
 
 
 /*
@@ -18,7 +24,6 @@ unsigned int thrust_hash(unsigned int a)
   return a;
 }
 */
-
 
 
 // Robert Jenkins' 96 bit Mix Function
