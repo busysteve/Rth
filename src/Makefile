@@ -34,8 +34,10 @@ flags_cudac = $(debug) --x cu -gencode $(CUDA_ARCH)  -Xcompiler "-fpic"
 cudac_comp = $(comp_cudac) $(flags_cudac) $(def_cudac)
 
 
+all: Rth.so
+
 Rth.so: $(objects)
-	$(cuda_link) -o Rth.so --shared $(objects)
+	mkdir -p ../libs/; $(cuda_link) -o ../libs/Rth.so --shared $(objects)
 
 
 rs.o : rs.cpp
@@ -99,7 +101,10 @@ threads.o : threads.cpp
 	$(cuda_comp) -c threads.cpp $(inc) $(def)
 
 clean:
-	rm -rf *.o Rth.so
+	rm -rf *.o ../libs/Rth.so 
+
+package:
+	cd ../../; mkdir -p ./Rth/libs; rm ./Rth/libs/Rth.so; tar -czvf Rth.1.0.1.gz ./Rth/libs ./Rth/INSTALL ./Rth/NAMESPACE ./Rth/DESCRIPTION ./Rth/demo ./Rth/man ./Rth/R ./Rth/test  ./Rth/src/*.c* ./Rth/src/*.h
 
 
 
