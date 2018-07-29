@@ -23,6 +23,11 @@ def_cuda = -DTHRUST_DEVICE_SYSTEM=THRUST_DEVICE_BACKEND_CUDA -DGPU
 flags_cuda = $(debug) --std=c++11 --x cu -gencode $(CUDA_ARCH)  -Xcompiler "-fpic" 
 cuda_comp = $(comp_cuda) $(flags_cuda) $(def_cuda)
 
+comp_gcc = g++
+def_gcc = -fopenmp -DTHRUST_DEVICE_SYSTEM=THRUST_DEVICE_BACKEND_OMP
+flag_gcc = $(debug) --std=c++11 -fPIC
+gcc_comp = $(comp_gcc) $(flags_gcc) $(def_gcc)
+
 comp_cudac = nvcc
 def_cudac =  -DTHRUST_DEVICE_SYSTEM=THRUST_DEVICE_BACKEND_CUDA -DGPU
 flags_cudac = $(debug) --x cu -gencode $(CUDA_ARCH)  -Xcompiler "-fpic" 
@@ -30,10 +35,9 @@ cudac_comp = $(comp_cudac) $(flags_cudac) $(def_cudac)
 
 
 all: Rth.so
-#.PHONY:	Rth.so
 
 Rth.so: $(objects)
-	$(cuda_link) -o Rth.so --shared $(objects)
+	mkdir -p ../libs/; $(cuda_link) -o ../libs/Rth.so --shared $(objects)
 
 
 rs.o : rs.cpp
@@ -100,7 +104,7 @@ clean:
 	rm -rf *.o ../libs/Rth.so 
 
 package:
-	cd ../../; tar -czvf Rth.1.0.1.gz ./Rth/libs ./Rth/INSTALL ./Rth/NAMESPACE ./Rth/DESCRIPTION ./Rth/demo ./Rth/man ./Rth/R ./Rth/test  ./Rth/src/*.c* ./Rth/src/*.h ./Rth/src/Makefile
+	cd ../../; mkdir -p ./Rth/libs; rm ./Rth/libs/Rth.so; tar -czvf Rth.1.0.1.gz ./Rth/libs ./Rth/INSTALL ./Rth/NAMESPACE ./Rth/DESCRIPTION ./Rth/demo ./Rth/man ./Rth/R ./Rth/test  ./Rth/src/*.c* ./Rth/src/*.h
 
 
 

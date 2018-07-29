@@ -1,36 +1,33 @@
 
 #objects = hash.o rs.o rthcolsums.o rthdist.o rthgini.o rthhist.o rthkendall.o rthma.o rthmean.o rthnorm.o rthorder.o rthpdist.o rthpearson.o rthrnorm.o rthrunif.o rthsort.o rthtable.o rthxpos.o rthxposnv.o threads.o
-
 ##objects = hash.o rs.o             rthdist.o rthgini.o rthhist.o                      rthmean.o rthnorm.o rthorder.o rthpdist.o rthpearson.o rthrnorm.o            rthsort.o rthtable.o rthxpos.o rthxposnv.o threads.o
-
-objects = hash.o rs.o rthcolsums.o  rthdist.o rthgini.o rthhist.o                      rthmean.o rthnorm.o rthorder.o rthpdist.o rthpearson.o rthrnorm.o            rthsort.o rthtable.o rthxpos.o rthxposnv.o threads.o
+objects = hash.o rs.o               rthdist.o           rthhist.o                      rthmean.o rthnorm.o rthorder.o rthpdist.o rthpearson.o rthrnorm.o            rthsort.o rthtable.o rthxpos.o rthxposnv.o threads.o
 
 #inc = -I/usr/share/R/include -I/home/smathews/thrust-1.8.1 -I/usr/local/cuda/include  -I/usr/lib/R/site-library/Rcpp/include
 
-inc = -I/usr/share/R/include -I/usr/local/cuda/include -I/usr/lib/R/site-library/Rcpp/include
+inc = -I/usr/share/R/include -I/usr/local/cuda/include -I../inst/include/ -I/usr/lib/R/site-library/Rcpp/include
 
-#debug = -g 
-
-CUDA_ARCH="arch=compute_35,code=sm_35"
 
 link_cuda = nvcc
-linkflags_cuda = $(debug) -gencode $(CUDA_ARCH) 
+linkflags_cuda = -gencode arch=compute_30,code=sm_30 
 def_cudalink =  -L/usr/local/cuda/lib64 -lcuda -lcudart 
 cuda_link = $(link_cuda) $(linkflags_cuda) $(def_cudalink)
 
 comp_cuda = nvcc
 def_cuda = -DTHRUST_DEVICE_SYSTEM=THRUST_DEVICE_BACKEND_CUDA -DGPU
-flags_cuda = $(debug) --std=c++11 --x cu -gencode $(CUDA_ARCH)  -Xcompiler "-fpic" 
+flags_cuda = --std=c++11 --x cu -gencode arch=compute_30,code=sm_30 -Xcompiler "-fpic" 
 cuda_comp = $(comp_cuda) $(flags_cuda) $(def_cuda)
+
+comp_gcc = g++
+def_gcc = -fopenmp -DTHRUST_DEVICE_SYSTEM=THRUST_DEVICE_BACKEND_OMP
+flag_gcc = --std=c++11 -fPIC
+gcc_comp = $(comp_gcc) $(flags_gcc) $(def_gcc)
 
 comp_cudac = nvcc
 def_cudac =  -DTHRUST_DEVICE_SYSTEM=THRUST_DEVICE_BACKEND_CUDA -DGPU
-flags_cudac = $(debug) --x cu -gencode $(CUDA_ARCH)  -Xcompiler "-fpic" 
+flags_cudac =  --x cu -gencode arch=compute_30,code=sm_30 -Xcompiler "-fpic" 
 cudac_comp = $(comp_cudac) $(flags_cudac) $(def_cudac)
 
-
-all: Rth.so
-#.PHONY:	Rth.so
 
 Rth.so: $(objects)
 	$(cuda_link) -o Rth.so --shared $(objects)
@@ -42,14 +39,14 @@ rs.o : rs.cpp
 hash.o : hash.c
 	$(cudac_comp) -c hash.c $(inc) $(def)
 
-rthcolsums.o : rthcolsums.cpp
-	$(cuda_comp) -c rthcolsums.cpp $(inc) $(def)
+#rthcolsums.o : rthcolsums.cpp
+#	$(gcc_comp) -c rthcolsums.cpp $(inc) $(def)
 
 rthdist.o : rthdist.cpp
 	$(cuda_comp) -c rthdist.cpp $(inc) $(def)
 
-rthgini.o : rthgini.cpp
-	$(cuda_comp) -c rthgini.cpp $(inc) $(def)
+##rthgini.o : rthgini.cpp
+##	$(cuda_comp) -c rthgini.cpp $(inc) $(def)
 
 rthhist.o : rthhist.cpp
 	$(cuda_comp) -c rthhist.cpp $(inc) $(def)
@@ -97,10 +94,7 @@ threads.o : threads.cpp
 	$(cuda_comp) -c threads.cpp $(inc) $(def)
 
 clean:
-	rm -rf *.o ../libs/Rth.so 
-
-package:
-	cd ../../; tar -czvf Rth.1.0.1.gz ./Rth/libs ./Rth/INSTALL ./Rth/NAMESPACE ./Rth/DESCRIPTION ./Rth/demo ./Rth/man ./Rth/R ./Rth/test  ./Rth/src/*.c* ./Rth/src/*.h ./Rth/src/Makefile
+	rm -rf *.o Rth.so
 
 
 
