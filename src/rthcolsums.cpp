@@ -11,27 +11,6 @@
 #include "Rth.h"
 
 
-#ifdef GPU
-#define flouble float
-#else
-#define flouble double
-#endif
-
-#if 0
-static FILE* g_logfile;
-#define log_init(F)	{ g_logfile = fopen( F , "w" ); }
-#define log_close	{ fclose( g_logfile ); }
-#define log_sz(X)	{ fprintf( g_logfile, "[%d] - %s\n", 0, X ); fflush(g_logfile); }
-#define log_num(X)	{ fprintf( g_logfile, "[%d] - %d\n", 0, X ); fflush(g_logfile); }
-#define log_num2(X ,Y)	{ fprintf( g_logfile, "[%d] - %d - %d\n", 0, X, Y ); fflush(g_logfile); }
-#else
-#define log_init(F)	
-#define log_close	
-#define log_sz(X)	
-#define log_num(X)	
-#define log_num2(X,Y)	
-#endif
-
 // note that R uses column-major order, and Rcpp vectors retain this
 // ordering
 
@@ -74,7 +53,7 @@ extern "C" SEXP rthcolsums(SEXP m, SEXP nthreads) {
   // that all data with the same input keys are contiguous)
   //
   // colindices will be the "output keys"
-  thrust::device_vector<int> colindices(nr);
+  thrust::device_vector<int> colindices(nc);
 
   //Creating reduce by key counting iterator
   auto th_it = thrust::make_transform_iterator(

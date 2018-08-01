@@ -48,6 +48,7 @@ struct do1ival
   }
 };
 
+
 // compute distances from rows of inmat1 to rows of inmat2
 extern "C" SEXP rthdist(SEXP inmat, SEXP nthreads)
 {
@@ -72,6 +73,7 @@ extern "C" SEXP rthdist(SEXP inmat, SEXP nthreads)
      do1ival(dmat.begin(), ddst.begin(), nr,nc));
   
   PROTECT(ret = allocMatrix(REALSXP, nr, nr));
+//  thrust::copy(ddst.begin(), ddst.end(), REAL(ret));
   thrust::copy(ddst.begin(), ddst.end(), REAL(ret));
   
   

@@ -2,7 +2,7 @@
 
 library("Rth", lib.loc="~/R/x86_64-pc-linux-gnu-library/3.2")
 
-rthcolsumstest <- function( base=1, power=c(1))
+rthdisttest <- function( base=1, power=c(1))
 {
   #create an initial set of vectors - The first element will be removed later
   srun <- c(0)
@@ -11,9 +11,9 @@ rthcolsumstest <- function( base=1, power=c(1))
   for( i in power )
   {
     dat <- matrix( rnorm(i*i) , i, i );
-    elaps <- system.time( stdcolsums <- colSums( dat ) )
+    elaps <- system.time( std_dist <- dist( dat ) )
     srun <- c( srun, elaps[3] ) 
-    elaps <- system.time( rthcolsums <- rthcolsums( dat ) )
+    elaps <- system.time( rth_dist <- rthdist( dat ) )
     rthrun <- c( rthrun, elaps[3] ) 
   }
   
@@ -21,7 +21,7 @@ rthcolsumstest <- function( base=1, power=c(1))
   df <- df[,-1]
   
   barplot( df, 
-           main="R (colSums) vs Rth CUDA (rthcolsums)", 
+           main="R (dist) vs Rth CUDA (rthdist)", 
            horiz=TRUE, 
            col=c("black","green"), 
            beside=TRUE, 
@@ -32,6 +32,6 @@ rthcolsumstest <- function( base=1, power=c(1))
   )
 }
 
-rthcolsumstest( 2, seq( 1000, 2000, by=100 ) )
+rthdisttest( 2, seq( 100, 1000,by=100  ) )
 
 

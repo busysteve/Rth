@@ -23,3 +23,6 @@ rthsorttest <- function( base=1, power=1)
   #ts.plot( df, col=c(rep("blue",1),rep("red",1)) )
 }
 
+rthsorttest( 5, 9 )
+
+

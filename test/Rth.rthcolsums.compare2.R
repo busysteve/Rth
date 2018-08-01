@@ -19,7 +19,7 @@ rthcolsumstest <- function( base=1, power=c(1))
   
   df <- matrix( c( srun, rthrun), 2, byrow = TRUE )
   df <- df[,-1]
-  
+
   barplot( df, 
            main="R (colSums) vs Rth CUDA (rthcolsums)", 
            horiz=TRUE, 
@@ -29,7 +29,7 @@ rthcolsumstest <- function( base=1, power=c(1))
            xlab = "Time in seconds", 
            ylab = paste( base, "to the nth power "  ), 
            legend.text = c( "R", "Rth" ) 
-  )
+        )
 }
 
 rthcolsumstest( 2, seq( 1000, 2000, by=100 ) )

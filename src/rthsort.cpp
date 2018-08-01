@@ -1,6 +1,6 @@
 #include <thrust/device_vector.h>
 #include <thrust/sort.h>
-#include <thrust/sort.h>
+#include <thrust/execution_policy.h>
 
 #include "Rth.h"
 
@@ -11,24 +11,31 @@ extern "C" SEXP rthsort_double(SEXP a, SEXP decreasing, SEXP inplace,
   SEXP b;
   
   RTH_GEN_NTHREADS(nthreads);
-  
-  // set up device vector and copy xa to it
-  thrust::device_vector<double> dx(REAL(a), REAL(a)+LENGTH(a));
-  
+  int len = LENGTH(a);
+
+    // set up device vector and copy xa to it
+  thrust::device_vector<double> dx(  ((double*)REAL(a)), ((double*)( (REAL(a)))  )+len);
+
   // sort, then copy back to R vector
   if (INTEGER(decreasing)[0])
-    thrust::sort(dx.begin(), dx.end(), thrust::greater<double>());
+  {
+    thrust::sort( thrust::device, dx.begin(), dx.end(), thrust::greater<double>());
+  }
   else
-    thrust::sort(dx.begin(), dx.end());
+  {
+    thrust::sort( thrust::device, dx.begin(), dx.end());
+  }
+  
   
   if (INTEGER(inplace)[0]) {
-    thrust::copy(dx.begin(), dx.end(), REAL(a));
+    thrust::copy(dx.begin(), dx.end(), (double*)REAL(a));
     return R_NilValue;
   }
   else
   {
-    PROTECT(b = allocVector(REALSXP, LENGTH(a)));
-    thrust::copy(dx.begin(), dx.end(), REAL(b));
+    PROTECT(b = allocVector(REALSXP, len) );
+    
+    thrust::copy(dx.begin(), dx.end(), (double*)REAL(b));
     
     UNPROTECT(1);
     return b;
@@ -49,9 +56,9 @@ extern "C" SEXP rthsort_int(SEXP a, SEXP decreasing, SEXP inplace,
   thrust::device_vector<int> dx(INTEGER(a), INTEGER(a)+LENGTH(a));
   
   if (INTEGER(decreasing)[0])
-    thrust::sort(dx.begin(), dx.end(), thrust::greater<int>());
+    thrust::sort( thrust::device, dx.begin(), dx.end(), thrust::greater<int>());
   else
-    thrust::sort(dx.begin(), dx.end());
+    thrust::sort( thrust::device, dx.begin(), dx.end());
   
   if (INTEGER(inplace)[0])
   {

@@ -8,10 +8,13 @@ objects = hash.o rs.o rthcolsums.o  rthdist.o rthgini.o rthhist.o               
 #inc = -I/usr/share/R/include -I/home/smathews/thrust-1.8.1 -I/usr/local/cuda/include  -I/usr/lib/R/site-library/Rcpp/include
 
 inc = -I/usr/share/R/include -I/usr/local/cuda/include -I/usr/lib/R/site-library/Rcpp/include
+#inc = -I/usr/share/R/include -I/home/smathews/thrust-1.8.1 -I/usr/local/cuda/include -I/usr/lib/R/site-library/Rcpp/include
 
 #debug = -g 
 
-CUDA_ARCH="arch=compute_35,code=sm_35"
+CUDA_ARCH="arch=compute_30,code=sm_30"
+#CUDA_ARCH="arch=compute_35,code=sm_35"
+#CUDA_ARCH="arch=compute_61,code=sm_61"
 
 link_cuda = nvcc
 linkflags_cuda = $(debug) -gencode $(CUDA_ARCH) 
