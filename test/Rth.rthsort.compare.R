@@ -32,6 +32,6 @@ rthsorttest <- function( base=1, power=c(1))
         )
 }
 
-rthsorttest( 2, 16:24 )
+rthsorttest( 2, 18:24 )
 
 

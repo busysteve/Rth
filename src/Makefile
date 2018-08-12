@@ -3,7 +3,7 @@
 
 ##objects = hash.o rs.o             rthdist.o rthgini.o rthhist.o                      rthmean.o rthnorm.o rthorder.o rthpdist.o rthpearson.o rthrnorm.o            rthsort.o rthtable.o rthxpos.o rthxposnv.o threads.o
 
-objects = hash.o rs.o rthcolsums.o  rthdist.o rthgini.o rthhist.o                      rthmean.o rthnorm.o rthorder.o rthpdist.o rthpearson.o rthrnorm.o            rthsort.o rthtable.o rthxpos.o rthxposnv.o threads.o
+objects = hash.o rs.o rthcolsums.o  rthdist.o rthgini.o rthhist.o                      rthmean.o rthnorm.o rthorder.o rthpdist.o rthpearson.o rthrnorm.o            rthsort.o rthsort2.o rthtable.o rthxpos.o rthxposnv.o threads.o
 
 #inc = -I/usr/share/R/include -I/home/smathews/thrust-1.8.1 -I/usr/local/cuda/include  -I/usr/lib/R/site-library/Rcpp/include
 
@@ -12,9 +12,9 @@ inc = -I/usr/share/R/include -I/usr/local/cuda/include -I/usr/lib/R/site-library
 
 #debug = -g 
 
-CUDA_ARCH="arch=compute_30,code=sm_30"
+#CUDA_ARCH="arch=compute_30,code=sm_30"
 #CUDA_ARCH="arch=compute_35,code=sm_35"
-#CUDA_ARCH="arch=compute_61,code=sm_61"
+CUDA_ARCH="arch=compute_61,code=sm_61"
 
 link_cuda = nvcc
 linkflags_cuda = $(debug) -gencode $(CUDA_ARCH) 
@@ -87,6 +87,9 @@ rthrnorm.o : rthrnorm.cpp
 rthsort.o : rthsort.cpp
 	$(cuda_comp) -c rthsort.cpp $(inc) $(def)
 
+rthsort2.o : rthsort2.cpp
+	$(cuda_comp) -c rthsort2.cpp $(inc) $(def)
+
 rthtable.o : rthtable.cpp
 	$(cuda_comp) -c rthtable.cpp $(inc) $(def)
 
@@ -103,7 +106,7 @@ clean:
 	rm -rf *.o ../libs/Rth.so 
 
 package:
-	cd ../../; tar -czvf Rth.1.0.1.gz ./Rth/libs ./Rth/INSTALL ./Rth/NAMESPACE ./Rth/DESCRIPTION ./Rth/demo ./Rth/man ./Rth/R ./Rth/test  ./Rth/src/*.c* ./Rth/src/*.h ./Rth/src/Makefile
+	cd ../../; tar -czvf Rth.1.0.1.gz ./Rth/INSTALL ./Rth/NAMESPACE ./Rth/DESCRIPTION ./Rth/demo ./Rth/man ./Rth/R ./Rth/test  ./Rth/src/*.c* ./Rth/src/*.h ./Rth/src/Makefile
 
 
 
