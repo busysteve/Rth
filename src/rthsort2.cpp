@@ -31,8 +31,12 @@ extern "C" SEXP rthsort2_double(SEXP a, SEXP decreasing, SEXP inplace,
   
   std::vector<int> chunks;
   
+  
+  int parts = len / 4;
+  
+  
   //for( int i=0; i<len; i+=10000000 )
-  for( int i=0; i<len; i+=100 )
+  for( int i=0; i<len; i+=parts )
   {
     chunks.push_back(i);
     log_num( i );
@@ -64,7 +68,7 @@ extern "C" SEXP rthsort2_double(SEXP a, SEXP decreasing, SEXP inplace,
 
   log_sz( "Entering split sort loop");
   
-  for( int shift=0; shift <= chunks.size(); shift++ )
+  for( int shift=0; shift < chunks.size()-1; shift++ )
   {
     dx.clear();
 
@@ -72,17 +76,27 @@ extern "C" SEXP rthsort2_double(SEXP a, SEXP decreasing, SEXP inplace,
     log_num( shift );
     log_sz( "");
     
+    
+    
     for( int sweep=0; sweep < chunks.size()-1; sweep++ )
     {
       log_num( sweep );
-      int cut = (chunks[sweep+1]-chunks[sweep]);
-      int slice = ( cut / (chunks.size()-1) ) * shift;
-      int cut_start = chunks[sweep] / (chunks.size()-1) ; //+ slice;
-      int cut_end = cut_start + (cut / (chunks.size()-1));
-      
-      log_num( cut );
-      log_num2( ( cut_start), ( cut_end )  );
-      dx.insert( dx.end(), hm.begin()+( cut_start ),  hm.begin()+( cut_end )  );
+      int cut_start = chunks[sweep];
+      int cut_end = chunks[sweep+1];
+      int cut = (cut_end-cut_start);
+      int cut_offset = ( cut/chunks.size()-1 ) * shift;
+      int slice = ( cut / (chunks.size() - 1 ) );
+      int slice_start = slice; // * shift;
+      int slice_end = slice_start + slice;
+      int offset = (((cut_end - cut_start) / (chunks.size()-1)   ) * shift  );
+      int offset_shift = (((cut_end - cut_start) / (chunks.size()-1)   ) * sweep  );
+      int slice_shift = slice * shift;
+      log_num3( (slice), (cut_offset), (offset) );
+      log_num3( ( slice_start ), ( slice_end ), ( slice_shift ) );
+      log_num3( (cut), ( cut_start), ( cut_end )  );
+      log_num2(  ( cut_start + offset_shift ),  ( cut_start + offset_shift + slice )  );
+      //dx.insert( dx.end(), hm.begin()+( cut_start ),  hm.begin()+( cut_start + slice + cut_offset )  );
+      dx.insert( dx.end(), hm.begin()+( cut_start + offset_shift ),  hm.begin()+( cut_start + offset_shift + slice )  );
       log_sz_num( "dx.size()", dx.size() );
     }
     
@@ -97,28 +111,34 @@ extern "C" SEXP rthsort2_double(SEXP a, SEXP decreasing, SEXP inplace,
       thrust::sort(  thrust::device, dx.begin(), dx.end()  );
     }
     
-    log_sz( "");
-    log_sz( "Returning sorted chunks");
+    log_sz( "");  log_sz( "Returning sorted chunks");
 
-    
-    
     for( int sweep=0; sweep < chunks.size()-1; sweep++ )
     {
       log_num( sweep );
-      int cut = (chunks[sweep+1]-chunks[sweep]);
-      int slice = ( cut / (chunks.size() - 1 ) ) * shift;
-      int cut_start = chunks[sweep] / (chunks.size()-1);
-      int cut_end = cut_start + (cut / (chunks.size()-1));
-      int offset = cut_start + (((cut_end - cut_start) / (chunks.size()-1)   ) * sweep  );
+      int cut_start = chunks[sweep];
+      int cut_end = chunks[sweep+1];
+      int cut = (cut_end-cut_start);
+      int slice = ( cut / (chunks.size() - 1 ) );
+      int slice_start = slice; // * shift;
+      int slice_end = slice_start + slice;
+      int offset = cut_start + (((cut_end - cut_start) / (chunks.size()-1)   ) * shift  );
+      int slice_shift = slice * shift;
       log_num( cut );
       log_num2( ( cut_start), ( cut_end )  );
-      log_sz_num( "offset", offset );
-      log_num( ( cut_start * (chunks.size()-1) + offset ) );
+      log_num( offset );
+
+      log_num( ( slice_start ) );
+      log_num( ( slice ) );
+      log_num( ( slice_start ) );
+      log_num( ( slice_end ) );
+      log_num( ( slice_shift ) );
       
+      log_num3(  ( slice*sweep ) , ( slice*sweep + slice )  , ( offset )  )
       thrust::copy( 
-        dx.begin() + ( cut_start ),  
-        dx.begin() + ( cut_end ), 
-        hm.begin() + ( cut_start * (chunks.size()-1) ) // chunks[sweep]// + cut * sweep
+        dx.begin() + ( slice*sweep ), 
+        dx.begin() + ( slice*sweep + slice ), 
+        hm.begin() + ( offset )  //+ slice*shift) // chunks[sweep]// + cut * sweep
       );
       
     }
@@ -129,17 +149,20 @@ extern "C" SEXP rthsort2_double(SEXP a, SEXP decreasing, SEXP inplace,
   }
   
 
-  
+  log_sz( "Sorting complete");
   
   
   
   
   
     
-  log_close;
+  log_sz( "Returning results");
+    
   
   if (INTEGER(inplace)[0]) {
     thrust::copy(dx.begin(), dx.end(), (double*)REAL(a));
+    log_sz( "Done");
+    log_close;
     return R_NilValue;
   }
   else
@@ -149,8 +172,13 @@ extern "C" SEXP rthsort2_double(SEXP a, SEXP decreasing, SEXP inplace,
     thrust::copy(hm.begin() , hm.end(), (double*)REAL(b));
     
     UNPROTECT(1);
+    log_sz( "Done");
+    log_close;
     return b;
   }
+  
+  
+
   
   
   

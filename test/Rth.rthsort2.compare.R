@@ -58,7 +58,7 @@ rthsorttest2 <- function( base=1, power=c(1))
            main="R vs Rth(CUDA) ", 
            horiz=TRUE, 
            #col=c( "black", "green", "lightblue" ), 
-           col=c( "black", "lightblue" ), 
+           col=c( "black", "red" ), 
            beside=TRUE, 
            names.arg = c( power ), 
            xlab = "Time in seconds", 
@@ -69,6 +69,6 @@ rthsorttest2 <- function( base=1, power=c(1))
 }
 
 #rthsorttest2( 2, 24 )
-rthsorttest2( 2, 9 )
+rthsorttest2( 2, 8 )
 
 
